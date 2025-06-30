@@ -21,6 +21,7 @@ import {
   VideoIcon,
   VideoOffIcon,
   PhoneIcon,
+  VolumeX,
 } from "lucide-react";
 import {
   clearSessionTime,
@@ -57,6 +58,14 @@ export const Conversation: React.FC = () => {
   const remoteParticipantIds = useParticipantIds({ filter: "remote" });
   const [start, setStart] = useState(false);
   const [interviewDuration, setInterviewDuration] = useState(0);
+  const [audioOnlyMode, setAudioOnlyMode] = useState(false);
+
+  // Check if we're in audio-only mode
+  useEffect(() => {
+    if (localSessionId && localVideo.isOff && localVideo.state === 'off') {
+      setAudioOnlyMode(true);
+    }
+  }, [localSessionId, localVideo.isOff, localVideo.state]);
 
   useEffect(() => {
     if (remoteParticipantIds.length && !start) {
@@ -117,19 +126,23 @@ export const Conversation: React.FC = () => {
       daily
         ?.join({
           url: conversation.conversation_url,
-          startVideoOff: false,
+          startVideoOff: audioOnlyMode,
           startAudioOff: true,
         })
         .then(() => {
-          daily?.setLocalVideo(true);
+          if (!audioOnlyMode) {
+            daily?.setLocalVideo(true);
+          }
           daily?.setLocalAudio(false);
         });
     }
-  }, [conversation?.conversation_url]);
+  }, [conversation?.conversation_url, audioOnlyMode]);
 
   const toggleVideo = useCallback(() => {
-    daily?.setLocalVideo(!isCameraEnabled);
-  }, [daily, isCameraEnabled]);
+    if (!audioOnlyMode) {
+      daily?.setLocalVideo(!isCameraEnabled);
+    }
+  }, [daily, isCameraEnabled, audioOnlyMode]);
 
   const toggleAudio = useCallback(() => {
     daily?.setLocalAudio(!isMicEnabled);
@@ -187,18 +200,34 @@ export const Conversation: React.FC = () => {
                 <div className="text-right">
                   <p className="font-semibold">{currentInterview.setup.jobTitle}</p>
                   <p className="text-gray-300">{currentInterview.setup.company}</p>
-                  <p className="text-xs text-gray-400 capitalize">
+                  <p className="text-xs text-gray-400 capitalize flex items-center gap-1">
+                    {audioOnlyMode && <VolumeX className="size-3" />}
                     {currentInterview.setup.difficulty} • {currentInterview.setup.interviewType}
+                    {audioOnlyMode && " • Audio Only"}
                   </p>
                 </div>
               </div>
             )}
 
-            <Video
-              id={remoteParticipantIds[0]}
-              className="size-full"
-              tileClassName="!object-cover"
-            />
+            {/* Audio-Only Mode Indicator */}
+            {audioOnlyMode && (
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black/80 backdrop-blur-sm rounded-lg p-8 border border-primary/20 text-center">
+                <VolumeX className="size-16 text-primary mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-white mb-2">Audio-Only Interview</h3>
+                <p className="text-gray-300 max-w-md">
+                  Your interview is proceeding in audio-only mode. Focus on your voice and responses - AERIS is listening and will provide comprehensive feedback.
+                </p>
+              </div>
+            )}
+
+            {/* Remote Video (AI Interviewer) */}
+            {!audioOnlyMode && (
+              <Video
+                id={remoteParticipantIds[0]}
+                className="size-full"
+                tileClassName="!object-cover"
+              />
+            )}
           </>
         ) : (
           <div className="flex h-full items-center justify-center flex-col gap-4">
@@ -207,11 +236,14 @@ export const Conversation: React.FC = () => {
               speed="1.75"
               color="white"
             ></l-quantum>
-            <p className="text-white text-lg">Connecting to AERIS...</p>
+            <p className="text-white text-lg">
+              {audioOnlyMode ? "Connecting to AERIS (Audio Only)..." : "Connecting to AERIS..."}
+            </p>
           </div>
         )}
         
-        {localSessionId && (
+        {/* Local Video (User) - Only show if not in audio-only mode */}
+        {localSessionId && !audioOnlyMode && (
           <Video
             id={localSessionId}
             tileClassName="!object-cover"
@@ -234,18 +266,23 @@ export const Conversation: React.FC = () => {
               <MicIcon className="size-6" />
             )}
           </Button>
-          <Button
-            size="icon"
-            className="border border-primary shadow-[0_0_20px_rgba(34,197,254,0.2)]"
-            variant="secondary"
-            onClick={toggleVideo}
-          >
-            {!isCameraEnabled ? (
-              <VideoOffIcon className="size-6" />
-            ) : (
-              <VideoIcon className="size-6" />
-            )}
-          </Button>
+          
+          {/* Only show video toggle if not in audio-only mode */}
+          {!audioOnlyMode && (
+            <Button
+              size="icon"
+              className="border border-primary shadow-[0_0_20px_rgba(34,197,254,0.2)]"
+              variant="secondary"
+              onClick={toggleVideo}
+            >
+              {!isCameraEnabled ? (
+                <VideoOffIcon className="size-6" />
+              ) : (
+                <VideoIcon className="size-6" />
+              )}
+            </Button>
+          )}
+          
           <Button
             size="icon"
             className="bg-[rgba(251,36,71,0.80)] backdrop-blur hover:bg-[rgba(251,36,71,0.60)] border border-[rgba(251,36,71,0.9)] shadow-[0_0_20px_rgba(251,36,71,0.3)]"

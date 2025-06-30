@@ -8,7 +8,7 @@ import { conversationAtom } from "@/store/conversation";
 import { interviewSetupAtom, currentInterviewAtom, InterviewSession } from "@/store/interview";
 import React, { useCallback, useMemo, useState } from "react";
 import { useAtom, useAtomValue } from "jotai";
-import { AlertTriangle, Mic, Video } from "lucide-react";
+import { AlertTriangle, Mic, Video, VolumeX } from "lucide-react";
 import { useDaily, useDailyEvent, useDevices } from "@daily-co/daily-react";
 import { ConversationError } from "./ConversationError";
 import zoomSound from "@/assets/sounds/zoom.mp3";
@@ -70,6 +70,8 @@ export const Instructions: React.FC = () => {
   const { currentMic, setMicrophone, setSpeaker } = useDevices();
   const { createConversationRequest } = useCreateConversationMutation();
   const [getUserMediaError, setGetUserMediaError] = useState(false);
+  const [cameraError, setCameraError] = useState(false);
+  const [audioOnlyMode, setAudioOnlyMode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingConversation, setIsLoadingConversation] = useState(false);
   const [error, setError] = useState(false);
@@ -85,7 +87,9 @@ export const Instructions: React.FC = () => {
   useDailyEvent(
     "camera-error",
     useCallback(() => {
-      setGetUserMediaError(true);
+      console.log("Camera error detected, switching to audio-only mode");
+      setCameraError(true);
+      setAudioOnlyMode(true);
     }, []),
   );
 
@@ -103,12 +107,15 @@ export const Instructions: React.FC = () => {
       setIsLoadingConversation(true);
       
       let micDeviceId = currentMic?.device?.deviceId;
-      if (!micDeviceId) {
+      
+      try {
+        // Try to start with camera first
         const res = await daily?.startCamera({
           startVideoOff: false,
           startAudioOff: false,
           audioSource: "default",
         });
+        
         // @ts-expect-error deviceId exists in the MediaDeviceInfo
         const isDefaultMic = res?.mic?.deviceId === "default";
         // @ts-expect-error deviceId exists in the MediaDeviceInfo
@@ -124,8 +131,33 @@ export const Instructions: React.FC = () => {
             setSpeaker("default");
           }
         }
+      } catch (cameraErr) {
+        console.log("Camera not available, trying audio-only mode");
+        setCameraError(true);
+        setAudioOnlyMode(true);
+        
+        try {
+          // Try audio-only mode
+          const res = await daily?.startCamera({
+            startVideoOff: true,
+            startAudioOff: false,
+            audioSource: "default",
+          });
+          
+          // @ts-expect-error deviceId exists in the MediaDeviceInfo
+          micDeviceId = res?.mic?.deviceId;
+          
+          if (!micDeviceId) {
+            setMicrophone("default");
+          }
+        } catch (audioErr) {
+          console.error("Audio also failed:", audioErr);
+          setGetUserMediaError(true);
+          return;
+        }
       }
-      if (micDeviceId) {
+      
+      if (micDeviceId || audioOnlyMode) {
         await createConversationRequest();
       } else {
         setGetUserMediaError(true);
@@ -137,6 +169,13 @@ export const Instructions: React.FC = () => {
       setIsLoading(false);
       setIsLoadingConversation(false);
     }
+  };
+
+  const handleAudioOnlyClick = async () => {
+    setAudioOnlyMode(true);
+    setCameraError(false);
+    setGetUserMediaError(false);
+    await handleClick();
   };
 
   if (isPlayingSound || isLoadingConversation) {
@@ -158,7 +197,14 @@ export const Instructions: React.FC = () => {
               speed="1.75"
               color="white"
             ></l-quantum>
-            <p className="text-white text-lg">Preparing your interview with AERIS...</p>
+            <p className="text-white text-lg">
+              {audioOnlyMode ? "Preparing your audio interview with AERIS..." : "Preparing your interview with AERIS..."}
+            </p>
+            {audioOnlyMode && (
+              <p className="text-gray-300 text-sm text-center max-w-md">
+                Audio-only mode enabled. Your interview will proceed without video.
+              </p>
+            )}
           </div>
         </AnimatedTextBlockWrapper>
       </DialogWrapper>
@@ -202,32 +248,87 @@ export const Instructions: React.FC = () => {
             AERIS will conduct a professional interview simulation. Be yourself, stay confident, and remember - this is practice to help you succeed!
           </p>
 
-          <Button
-            onClick={handleClick}
-            className="relative z-20 flex items-center justify-center gap-2 rounded-3xl border border-[rgba(255,255,255,0.3)] px-8 py-3 text-lg font-semibold text-white transition-all duration-200 hover:text-black mb-8 disabled:opacity-50 bg-primary/20 hover:bg-primary"
-            disabled={isLoading}
-            style={{
-              height: '56px',
-              transition: 'all 0.2s ease-in-out',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow = '0 0 20px rgba(34, 197, 254, 0.6)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow = 'none';
-            }}
-          >
-            <Video className="size-5" />
-            Start Interview with AERIS
-            {getUserMediaError && (
-              <div className="absolute -top-1 left-0 right-0 flex items-center gap-1 text-wrap rounded-lg border bg-red-500 p-2 text-white backdrop-blur-sm">
-                <AlertTriangle className="text-red size-4" />
-                <p>
-                  Please allow camera and microphone access to continue with your interview practice.
-                </p>
+          {/* Camera Error Warning */}
+          {cameraError && !audioOnlyMode && (
+            <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4 max-w-md mx-auto">
+              <div className="flex items-center gap-2 text-yellow-400 mb-2">
+                <AlertTriangle className="size-5" />
+                <span className="font-medium">Camera Not Available</span>
               </div>
-            )}
-          </Button>
+              <p className="text-gray-300 text-sm mb-3">
+                Your camera couldn't be accessed, but you can continue with audio-only interview.
+              </p>
+              <Button
+                onClick={handleAudioOnlyClick}
+                className="w-full bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-100 border border-yellow-500/30"
+              >
+                <VolumeX className="size-4 mr-2" />
+                Continue Audio-Only
+              </Button>
+            </div>
+          )}
+
+          {/* Main Start Button */}
+          {!cameraError && (
+            <Button
+              onClick={handleClick}
+              className="relative z-20 flex items-center justify-center gap-2 rounded-3xl border border-[rgba(255,255,255,0.3)] px-8 py-3 text-lg font-semibold text-white transition-all duration-200 hover:text-black mb-8 disabled:opacity-50 bg-primary/20 hover:bg-primary"
+              disabled={isLoading}
+              style={{
+                height: '56px',
+                transition: 'all 0.2s ease-in-out',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.boxShadow = '0 0 20px rgba(34, 197, 254, 0.6)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.boxShadow = 'none';
+              }}
+            >
+              <Video className="size-5" />
+              Start Interview with AERIS
+            </Button>
+          )}
+
+          {/* Audio-Only Mode Indicator */}
+          {audioOnlyMode && (
+            <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 max-w-md mx-auto">
+              <div className="flex items-center gap-2 text-blue-400 mb-2">
+                <VolumeX className="size-5" />
+                <span className="font-medium">Audio-Only Mode</span>
+              </div>
+              <p className="text-gray-300 text-sm">
+                Your interview will proceed with audio only. AERIS will still provide the same quality coaching experience.
+              </p>
+            </div>
+          )}
+
+          {/* Permission Error */}
+          {getUserMediaError && (
+            <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 max-w-md mx-auto">
+              <div className="flex items-center gap-2 text-red-400 mb-2">
+                <AlertTriangle className="size-5" />
+                <span className="font-medium">Media Access Required</span>
+              </div>
+              <p className="text-gray-300 text-sm mb-3">
+                Please allow microphone access to continue with your interview practice.
+              </p>
+              <div className="flex gap-2">
+                <Button
+                  onClick={handleClick}
+                  className="flex-1 bg-primary/20 hover:bg-primary/30 text-primary border border-primary/30"
+                >
+                  Try Again
+                </Button>
+                <Button
+                  onClick={handleAudioOnlyClick}
+                  className="flex-1 bg-gray-500/20 hover:bg-gray-500/30 text-gray-300 border border-gray-500/30"
+                >
+                  Audio Only
+                </Button>
+              </div>
+            </div>
+          )}
 
           <div className="flex flex-col gap-4 sm:flex-row sm:gap-8 text-gray-400 justify-center">
             <div className="flex items-center gap-3 bg-[rgba(0,0,0,0.2)] px-4 py-2 rounded-full">
@@ -235,13 +336,14 @@ export const Instructions: React.FC = () => {
               Microphone required
             </div>
             <div className="flex items-center gap-3 bg-[rgba(0,0,0,0.2)] px-4 py-2 rounded-full">
-              <Video className="size-5 text-primary" />
-              Camera recommended
+              <Video className="size-5 text-gray-400" />
+              Camera optional
             </div>
           </div>
 
           <p className="text-sm text-gray-500 max-w-lg mx-auto">
             Your interview will be analyzed in real-time to provide personalized feedback and help you improve your interview skills.
+            {audioOnlyMode && " Audio-only interviews still provide comprehensive feedback on your responses and communication skills."}
           </p>
         </div>
       </AnimatedTextBlockWrapper>

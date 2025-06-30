@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useAtom } from "jotai";
 import { screenAtom } from "@/store/screens";
-import { interviewSetupAtom, InterviewSetupYay } from "@/store/interview";
+import { interviewSetupAtom, InterviewSetup } from "@/store/interview";
 import { DialogWrapper, AnimatedTextBlockWrapper } from "@/components/DialogWrapper";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,9 +37,9 @@ const Select = React.forwardRef<
 });
 Select.displayName = "Select";
 
-export const InterviewSetupYay: React.FC = () => {
+export const InterviewSetupComponent: React.FC = () => {
   const [, setScreenState] = useAtom(screenAtom);
-  const [interviewSetupYay, setInterviewSetupYay] = useAtom(interviewSetupAtom);
+  const [interviewSetup, setInterviewSetup] = useAtom(interviewSetupAtom);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleBack = () => {
@@ -47,7 +47,7 @@ export const InterviewSetupYay: React.FC = () => {
   };
 
   const handleStartInterview = async () => {
-    if (!interviewSetupYay.jobTitle || !interviewSetupYay.company) {
+    if (!interviewSetup.jobTitle || !interviewSetup.company) {
       alert("Please fill in at least the job title and company name.");
       return;
     }
@@ -64,8 +64,8 @@ export const InterviewSetupYay: React.FC = () => {
     }
   };
 
-  const updateSetup = (field: keyof InterviewSetupYay, value: string | number) => {
-    setInterviewSetupYay(prev => ({
+  const updateSetup = (field: keyof InterviewSetup, value: string | number) => {
+    setInterviewSetup(prev => ({
       ...prev,
       [field]: value
     }));
@@ -116,7 +116,7 @@ export const InterviewSetupYay: React.FC = () => {
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-white">Job Title *</label>
                   <Input
-                    value={interviewSetupYay.jobTitle}
+                    value={interviewSetup.jobTitle}
                     onChange={(e) => updateSetup('jobTitle', e.target.value)}
                     placeholder="e.g., Software Engineer"
                     className="bg-black/20 text-white placeholder:text-gray-400"
@@ -126,7 +126,7 @@ export const InterviewSetupYay: React.FC = () => {
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-white">Company *</label>
                   <Input
-                    value={interviewSetupYay.company}
+                    value={interviewSetup.company}
                     onChange={(e) => updateSetup('company', e.target.value)}
                     placeholder="e.g., Google"
                     className="bg-black/20 text-white placeholder:text-gray-400"
@@ -137,7 +137,7 @@ export const InterviewSetupYay: React.FC = () => {
               <div className="space-y-2">
                 <label className="text-sm font-medium text-white">Job Description</label>
                 <Textarea
-                  value={interviewSetupYay.description}
+                  value={interviewSetup.description}
                   onChange={(e) => updateSetup('description', e.target.value)}
                   placeholder="Paste the job description here or describe the role..."
                   rows={4}
@@ -147,7 +147,7 @@ export const InterviewSetupYay: React.FC = () => {
               <div className="space-y-2">
                 <label className="text-sm font-medium text-white">Key Requirements</label>
                 <Textarea
-                  value={interviewSetupYay.requirements}
+                  value={interviewSetup.requirements}
                   onChange={(e) => updateSetup('requirements', e.target.value)}
                   placeholder="List the key skills and requirements for this position..."
                   rows={3}
@@ -166,7 +166,7 @@ export const InterviewSetupYay: React.FC = () => {
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-white">Difficulty Level</label>
                   <Select
-                    value={interviewSetupYay.difficulty}
+                    value={interviewSetup.difficulty}
                     onChange={(e) => updateSetup('difficulty', e.target.value as 'easy' | 'medium' | 'complex')}
                   >
                     <option value="easy">Easy</option>
@@ -174,14 +174,14 @@ export const InterviewSetupYay: React.FC = () => {
                     <option value="complex">Complex</option>
                   </Select>
                   <p className="text-xs text-gray-400">
-                    {difficultyDescriptions[interviewSetupYay.difficulty]}
+                    {difficultyDescriptions[interviewSetup.difficulty]}
                   </p>
                 </div>
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-white">Interview Type</label>
                   <Select
-                    value={interviewSetupYay.interviewType}
+                    value={interviewSetup.interviewType}
                     onChange={(e) => updateSetup('interviewType', e.target.value as any)}
                   >
                     <option value="mixed">Mixed</option>
@@ -190,7 +190,7 @@ export const InterviewSetupYay: React.FC = () => {
                     <option value="situational">Situational</option>
                   </Select>
                   <p className="text-xs text-gray-400">
-                    {interviewTypeDescriptions[interviewSetupYay.interviewType]}
+                    {interviewTypeDescriptions[interviewSetup.interviewType]}
                   </p>
                 </div>
               </div>
@@ -198,7 +198,7 @@ export const InterviewSetupYay: React.FC = () => {
               <div className="space-y-2">
                 <label className="text-sm font-medium text-white">Duration</label>
                 <Select
-                  value={interviewSetupYay.duration.toString()}
+                  value={interviewSetup.duration.toString()}
                   onChange={(e) => updateSetup('duration', parseInt(e.target.value))}
                 >
                   <option value="15">15 minutes</option>
@@ -214,12 +214,12 @@ export const InterviewSetupYay: React.FC = () => {
                 <div>
                   <h3 className="text-lg font-semibold text-white">Ready to Start?</h3>
                   <p className="text-gray-300">
-                    AERIS will conduct a {interviewSetupYay.duration}-minute {interviewSetupYay.difficulty} {interviewSetupYay.interviewType} interview
+                    AERIS will conduct a {interviewSetup.duration}-minute {interviewSetup.difficulty} {interviewSetup.interviewType} interview
                   </p>
                 </div>
                 <Button
                   onClick={handleStartInterview}
-                  disabled={isLoading || !interviewSetupYay.jobTitle || !interviewSetupYay.company}
+                  disabled={isLoading || !interviewSetup.jobTitle || !interviewSetup.company}
                   className="bg-primary hover:bg-primary/90 text-black font-semibold flex items-center gap-2"
                 >
                   {isLoading ? (

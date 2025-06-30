@@ -1,6 +1,6 @@
 import { atom } from "jotai";
 
-export interface InterviewSetup {
+export interface InterviewSetupYay {
   jobTitle: string;
   company: string;
   description: string;

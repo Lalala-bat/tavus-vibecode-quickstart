@@ -87,140 +87,151 @@ export const InterviewSetup: React.FC = () => {
   return (
     <DialogWrapper>
       <AnimatedTextBlockWrapper>
-        <div className="w-full max-w-2xl space-y-6">
+        <div className="w-full max-w-4xl mx-auto space-y-4 sm:space-y-6 px-2 sm:px-4">
           {/* Header */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 sm:gap-4">
             <Button
               variant="ghost"
               size="icon"
               onClick={handleBack}
-              className="text-white hover:bg-white/10"
+              className="text-white hover:bg-white/10 flex-shrink-0"
             >
-              <ArrowLeft className="size-5" />
+              <ArrowLeft className="size-4 sm:size-5" />
             </Button>
-            <div>
-              <h2 className="text-2xl font-bold text-white">Interview Setup</h2>
-              <p className="text-gray-400">Configure your practice interview</p>
+            <div className="min-w-0 flex-1">
+              <h2 className="text-xl sm:text-2xl font-bold text-white truncate">Interview Setup</h2>
+              <p className="text-sm sm:text-base text-gray-400">Configure your practice interview</p>
             </div>
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* Job Information */}
-            <div className="space-y-4 bg-black/20 backdrop-blur-sm rounded-lg p-6 border border-white/10">
-              <div className="flex items-center gap-2 mb-4">
-                <Briefcase className="size-5 text-primary" />
-                <h3 className="text-lg font-semibold text-white">Job Information</h3>
+            <div className="space-y-3 sm:space-y-4 bg-black/20 backdrop-blur-sm rounded-lg p-4 sm:p-6 border border-white/10">
+              <div className="flex items-center gap-2 mb-2 sm:mb-4">
+                <Briefcase className="size-4 sm:size-5 text-primary flex-shrink-0" />
+                <h3 className="text-base sm:text-lg font-semibold text-white">Job Information</h3>
               </div>
               
-              <div className="grid md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-white">Job Title *</label>
+                  <label className="text-xs sm:text-sm font-medium text-white">Job Title *</label>
                   <Input
                     value={interviewSetup.jobTitle}
                     onChange={(e) => updateSetup('jobTitle', e.target.value)}
                     placeholder="e.g., Software Engineer"
-                    className="bg-black/20 text-white placeholder:text-gray-400"
+                    className="bg-black/20 text-white placeholder:text-gray-400 text-sm sm:text-base"
                   />
                 </div>
                 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-white">Company *</label>
+                  <label className="text-xs sm:text-sm font-medium text-white">Company *</label>
                   <Input
                     value={interviewSetup.company}
                     onChange={(e) => updateSetup('company', e.target.value)}
                     placeholder="e.g., Google"
-                    className="bg-black/20 text-white placeholder:text-gray-400"
+                    className="bg-black/20 text-white placeholder:text-gray-400 text-sm sm:text-base"
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-white">Job Description</label>
+                <label className="text-xs sm:text-sm font-medium text-white">Job Description</label>
                 <Textarea
                   value={interviewSetup.description}
                   onChange={(e) => updateSetup('description', e.target.value)}
                   placeholder="Paste the job description here or describe the role..."
-                  rows={4}
+                  rows={3}
+                  className="text-sm sm:text-base resize-none"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-white">Key Requirements</label>
+                <label className="text-xs sm:text-sm font-medium text-white">Key Requirements</label>
                 <Textarea
                   value={interviewSetup.requirements}
                   onChange={(e) => updateSetup('requirements', e.target.value)}
                   placeholder="List the key skills and requirements for this position..."
-                  rows={3}
+                  rows={2}
+                  className="text-sm sm:text-base resize-none"
                 />
               </div>
             </div>
 
             {/* Interview Configuration */}
-            <div className="space-y-4 bg-black/20 backdrop-blur-sm rounded-lg p-6 border border-white/10">
-              <div className="flex items-center gap-2 mb-4">
-                <Target className="size-5 text-primary" />
-                <h3 className="text-lg font-semibold text-white">Interview Configuration</h3>
+            <div className="space-y-3 sm:space-y-4 bg-black/20 backdrop-blur-sm rounded-lg p-4 sm:p-6 border border-white/10">
+              <div className="flex items-center gap-2 mb-2 sm:mb-4">
+                <Target className="size-4 sm:size-5 text-primary flex-shrink-0" />
+                <h3 className="text-base sm:text-lg font-semibold text-white">Interview Configuration</h3>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-white">Difficulty Level</label>
+                  <label className="text-xs sm:text-sm font-medium text-white">Difficulty Level</label>
                   <Select
                     value={interviewSetup.difficulty}
                     onChange={(e) => updateSetup('difficulty', e.target.value as 'easy' | 'medium' | 'complex')}
+                    className="text-sm sm:text-base"
                   >
                     <option value="easy">Easy</option>
                     <option value="medium">Medium</option>
                     <option value="complex">Complex</option>
                   </Select>
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-gray-400 leading-relaxed">
                     {difficultyDescriptions[interviewSetup.difficulty]}
                   </p>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-white">Interview Type</label>
+                  <label className="text-xs sm:text-sm font-medium text-white">Interview Type</label>
                   <Select
                     value={interviewSetup.interviewType}
                     onChange={(e) => updateSetup('interviewType', e.target.value as any)}
+                    className="text-sm sm:text-base"
                   >
                     <option value="mixed">Mixed</option>
                     <option value="behavioral">Behavioral</option>
                     <option value="technical">Technical</option>
                     <option value="situational">Situational</option>
                   </Select>
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-gray-400 leading-relaxed">
                     {interviewTypeDescriptions[interviewSetup.interviewType]}
                   </p>
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-white">Duration</label>
-                <Select
-                  value={interviewSetup.duration.toString()}
-                  onChange={(e) => updateSetup('duration', parseInt(e.target.value))}
-                >
-                  <option value="15">15 minutes</option>
-                  <option value="30">30 minutes</option>
-                  <option value="45">45 minutes</option>
-                </Select>
+                <label className="text-xs sm:text-sm font-medium text-white">Duration</label>
+                <div className="grid grid-cols-3 gap-2 sm:gap-3">
+                  {[15, 30, 45].map((duration) => (
+                    <button
+                      key={duration}
+                      onClick={() => updateSetup('duration', duration)}
+                      className={`p-2 sm:p-3 rounded-md border text-xs sm:text-sm font-medium transition-colors ${
+                        interviewSetup.duration === duration
+                          ? 'bg-primary text-black border-primary'
+                          : 'bg-black/20 text-white border-white/20 hover:border-primary/50'
+                      }`}
+                    >
+                      {duration} min
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
             {/* Start Interview */}
-            <div className="bg-gradient-to-r from-primary/20 to-primary/5 backdrop-blur-sm rounded-lg p-6 border border-primary/20">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-lg font-semibold text-white">Ready to Start?</h3>
-                  <p className="text-gray-300">
+            <div className="bg-gradient-to-r from-primary/20 to-primary/5 backdrop-blur-sm rounded-lg p-4 sm:p-6 border border-primary/20">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-base sm:text-lg font-semibold text-white mb-1 sm:mb-2">Ready to Start?</h3>
+                  <p className="text-sm sm:text-base text-gray-300 leading-relaxed">
                     AERIS will conduct a {interviewSetup.duration}-minute {interviewSetup.difficulty} {interviewSetup.interviewType} interview
                   </p>
                 </div>
                 <Button
                   onClick={handleStartInterview}
                   disabled={isLoading || !interviewSetup.jobTitle || !interviewSetup.company}
-                  className="bg-primary hover:bg-primary/90 text-black font-semibold flex items-center gap-2"
+                  className="bg-primary hover:bg-primary/90 text-black font-semibold flex items-center justify-center gap-2 w-full sm:w-auto sm:min-w-[140px] h-12 sm:h-14 text-sm sm:text-base"
                 >
                   {isLoading ? (
                     <>

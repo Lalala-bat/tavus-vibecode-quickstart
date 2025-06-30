@@ -5,6 +5,8 @@ export type Screen =
   | "outage"
   | "outOfMinutes"
   | "intro"
+  | "dashboard"
+  | "interviewSetup"
   | "instructions"
   | "settings"
   | "conversation"
@@ -12,6 +14,7 @@ export type Screen =
   | "positiveFeedback"
   | "negativeFeedback"
   | "finalScreen"
+  | "progress"
   | "sessionEnded";
 
 interface ScreenState {

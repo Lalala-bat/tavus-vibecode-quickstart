@@ -1,28 +1,15 @@
 import { atom } from "jotai";
 
-// Get initial token from localStorage
-const getInitialToken = (): string | null => {
-  const savedToken = localStorage.getItem('tavus-token');
-  return savedToken || null;
+// Get API key from environment variables
+const getApiKey = (): string => {
+  return import.meta.env.VITE_TAVUS_API_KEY || "";
 };
 
 // Atom to store the API token
-export const apiTokenAtom = atom<string | null>(getInitialToken());
+export const apiTokenAtom = atom<string>(getApiKey());
 
 // Atom to track if token is being validated
 export const isValidatingTokenAtom = atom(false);
 
 // Derived atom to check if token exists
-export const hasTokenAtom = atom((get) => get(apiTokenAtom) !== null);
-
-// Action atom to set token
-export const setApiTokenAtom = atom(null, (_, set, token: string) => {
-  localStorage.setItem('tavus-token', token);
-  set(apiTokenAtom, token);
-});
-
-// Action atom to clear token
-export const clearApiTokenAtom = atom(null, (_, set) => {
-  localStorage.removeItem('tavus-token');
-  set(apiTokenAtom, null);
-});
+export const hasTokenAtom = atom((get) => get(apiTokenAtom) !== null && get(apiTokenAtom) !== "");

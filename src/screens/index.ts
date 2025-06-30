@@ -8,3 +8,5 @@ export { Conversation } from "./Conversation";
 export { FinalScreen } from "./FinalScreen";
 export { ConversationError } from "./ConversationError";
 export { Settings } from "./Settings";
+export { Dashboard } from "./Dashboard";
+export { InterviewSetup } from "./InterviewSetup";

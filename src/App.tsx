@@ -11,6 +11,8 @@ import {
   Conversation,
   FinalScreen,
   Settings,
+  Dashboard,
+  InterviewSetup,
 } from "./screens";
 
 function App() {
@@ -26,6 +28,10 @@ function App() {
         return <OutOfMinutes />;
       case "intro":
         return <Intro />;
+      case "dashboard":
+        return <Dashboard />;
+      case "interviewSetup":
+        return <InterviewSetup />;
       case "settings":
         return <Settings />;
       case "instructions":
@@ -39,11 +45,13 @@ function App() {
     }
   };
 
+  const showHeaderFooter = !["introLoading", "conversation"].includes(currentScreen);
+
   return (
     <main className="flex h-svh flex-col items-center justify-between gap-3 p-5 sm:gap-4 lg:p-8 bg-black">
-      {currentScreen !== "introLoading" && <Header />}
+      {showHeaderFooter && <Header />}
       {renderScreen()}
-      {currentScreen !== "introLoading" && <Footer />}
+      {showHeaderFooter && <Footer />}
     </main>
   );
 }

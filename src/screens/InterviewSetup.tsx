@@ -1,41 +1,45 @@
 import React, { useState } from "react";
 import { useAtom } from "jotai";
 import { screenAtom } from "@/store/screens";
-import { interviewSetupAtom, InterviewSetup } from "@/store/interview";
+import { interviewSetupAtom, InterviewSetupYay } from "@/store/interview";
 import { DialogWrapper, AnimatedTextBlockWrapper } from "@/components/DialogWrapper";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft, Play, Clock, Target, Briefcase } from "lucide-react";
 
-// ✅ FIXED: Proper forwardRef with props typed for Textarea
-const Textarea = React.forwardRef<HTMLTextAreaElement, React.TextareaHTMLAttributes<HTMLTextAreaElement>>(
-  ({ className, ...props }, ref) => (
+const Textarea = React.forwardRef<
+  HTMLTextAreaElement,
+  React.TextareaHTMLAttributes<HTMLTextAreaElement>
+>(({ className, ...props }, ref) => {
+  return (
     <textarea
-      ref={ref}
       className={`flex min-h-[80px] w-full rounded-md border border-input bg-black/20 backdrop-blur-sm px-3 py-2 text-sm text-white placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
+      ref={ref}
       {...props}
     />
-  )
-);
+  );
+});
 Textarea.displayName = "Textarea";
 
-// ✅ FIXED: Proper forwardRef with props typed for Select
-const Select = React.forwardRef<HTMLSelectElement, React.SelectHTMLAttributes<HTMLSelectElement>>(
-  ({ className, children, ...props }, ref) => (
+const Select = React.forwardRef<
+  HTMLSelectElement,
+  React.SelectHTMLAttributes<HTMLSelectElement>
+>(({ className, children, ...props }, ref) => {
+  return (
     <select
-      ref={ref}
       className={`flex h-10 w-full rounded-md border border-input bg-black/20 backdrop-blur-sm px-3 py-2 text-sm text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
+      ref={ref}
       {...props}
     >
       {children}
     </select>
-  )
-);
+  );
+});
 Select.displayName = "Select";
 
 export const InterviewSetupYay: React.FC = () => {
   const [, setScreenState] = useAtom(screenAtom);
-  const [interviewSetup, setInterviewSetup] = useAtom(interviewSetupAtom);
+  const [interviewSetupYay, setInterviewSetupYay] = useAtom(interviewSetupAtom);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleBack = () => {
@@ -43,13 +47,14 @@ export const InterviewSetupYay: React.FC = () => {
   };
 
   const handleStartInterview = async () => {
-    if (!interviewSetup.jobTitle || !interviewSetup.company) {
+    if (!interviewSetupYay.jobTitle || !interviewSetupYay.company) {
       alert("Please fill in at least the job title and company name.");
       return;
     }
 
     setIsLoading(true);
     try {
+      // Save the setup and proceed to interview
       setScreenState({ currentScreen: "instructions" });
     } catch (error) {
       console.error("Error starting interview:", error);
@@ -59,8 +64,8 @@ export const InterviewSetupYay: React.FC = () => {
     }
   };
 
-  const updateSetup = (field: keyof InterviewSetup, value: string | number) => {
-    setInterviewSetup(prev => ({
+  const updateSetup = (field: keyof InterviewSetupYay, value: string | number) => {
+    setInterviewSetupYay(prev => ({
       ...prev,
       [field]: value
     }));
@@ -111,7 +116,7 @@ export const InterviewSetupYay: React.FC = () => {
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-white">Job Title *</label>
                   <Input
-                    value={interviewSetup.jobTitle}
+                    value={interviewSetupYay.jobTitle}
                     onChange={(e) => updateSetup('jobTitle', e.target.value)}
                     placeholder="e.g., Software Engineer"
                     className="bg-black/20 text-white placeholder:text-gray-400"
@@ -121,7 +126,7 @@ export const InterviewSetupYay: React.FC = () => {
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-white">Company *</label>
                   <Input
-                    value={interviewSetup.company}
+                    value={interviewSetupYay.company}
                     onChange={(e) => updateSetup('company', e.target.value)}
                     placeholder="e.g., Google"
                     className="bg-black/20 text-white placeholder:text-gray-400"
@@ -132,7 +137,7 @@ export const InterviewSetupYay: React.FC = () => {
               <div className="space-y-2">
                 <label className="text-sm font-medium text-white">Job Description</label>
                 <Textarea
-                  value={interviewSetup.description}
+                  value={interviewSetupYay.description}
                   onChange={(e) => updateSetup('description', e.target.value)}
                   placeholder="Paste the job description here or describe the role..."
                   rows={4}
@@ -142,7 +147,7 @@ export const InterviewSetupYay: React.FC = () => {
               <div className="space-y-2">
                 <label className="text-sm font-medium text-white">Key Requirements</label>
                 <Textarea
-                  value={interviewSetup.requirements}
+                  value={interviewSetupYay.requirements}
                   onChange={(e) => updateSetup('requirements', e.target.value)}
                   placeholder="List the key skills and requirements for this position..."
                   rows={3}
@@ -161,7 +166,7 @@ export const InterviewSetupYay: React.FC = () => {
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-white">Difficulty Level</label>
                   <Select
-                    value={interviewSetup.difficulty}
+                    value={interviewSetupYay.difficulty}
                     onChange={(e) => updateSetup('difficulty', e.target.value as 'easy' | 'medium' | 'complex')}
                   >
                     <option value="easy">Easy</option>
@@ -169,14 +174,14 @@ export const InterviewSetupYay: React.FC = () => {
                     <option value="complex">Complex</option>
                   </Select>
                   <p className="text-xs text-gray-400">
-                    {difficultyDescriptions[interviewSetup.difficulty]}
+                    {difficultyDescriptions[interviewSetupYay.difficulty]}
                   </p>
                 </div>
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-white">Interview Type</label>
                   <Select
-                    value={interviewSetup.interviewType}
+                    value={interviewSetupYay.interviewType}
                     onChange={(e) => updateSetup('interviewType', e.target.value as any)}
                   >
                     <option value="mixed">Mixed</option>
@@ -185,7 +190,7 @@ export const InterviewSetupYay: React.FC = () => {
                     <option value="situational">Situational</option>
                   </Select>
                   <p className="text-xs text-gray-400">
-                    {interviewTypeDescriptions[interviewSetup.interviewType]}
+                    {interviewTypeDescriptions[interviewSetupYay.interviewType]}
                   </p>
                 </div>
               </div>
@@ -193,7 +198,7 @@ export const InterviewSetupYay: React.FC = () => {
               <div className="space-y-2">
                 <label className="text-sm font-medium text-white">Duration</label>
                 <Select
-                  value={interviewSetup.duration.toString()}
+                  value={interviewSetupYay.duration.toString()}
                   onChange={(e) => updateSetup('duration', parseInt(e.target.value))}
                 >
                   <option value="15">15 minutes</option>
@@ -209,12 +214,12 @@ export const InterviewSetupYay: React.FC = () => {
                 <div>
                   <h3 className="text-lg font-semibold text-white">Ready to Start?</h3>
                   <p className="text-gray-300">
-                    AERIS will conduct a {interviewSetup.duration}-minute {interviewSetup.difficulty} {interviewSetup.interviewType} interview
+                    AERIS will conduct a {interviewSetupYay.duration}-minute {interviewSetupYay.difficulty} {interviewSetupYay.interviewType} interview
                   </p>
                 </div>
                 <Button
                   onClick={handleStartInterview}
-                  disabled={isLoading || !interviewSetup.jobTitle || !interviewSetup.company}
+                  disabled={isLoading || !interviewSetupYay.jobTitle || !interviewSetupYay.company}
                   className="bg-primary hover:bg-primary/90 text-black font-semibold flex items-center gap-2"
                 >
                   {isLoading ? (

@@ -7,34 +7,30 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft, Play, Clock, Target, Briefcase } from "lucide-react";
 
-const Textarea = React.forwardRef<
-  HTMLTextAreaElement,
-  React.TextareaHTMLAttributes<HTMLTextAreaElement>
->(({ className, ...props }, ref) => {
-  return (
+// ✅ FIXED: Proper forwardRef with props typed for Textarea
+const Textarea = React.forwardRef<HTMLTextAreaElement, React.TextareaHTMLAttributes<HTMLTextAreaElement>>(
+  ({ className, ...props }, ref) => (
     <textarea
-      className={`flex min-h-[80px] w-full rounded-md border border-input bg-black/20 backdrop-blur-sm px-3 py-2 text-sm text-white placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
       ref={ref}
+      className={`flex min-h-[80px] w-full rounded-md border border-input bg-black/20 backdrop-blur-sm px-3 py-2 text-sm text-white placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
       {...props}
     />
-  );
-});
+  )
+);
 Textarea.displayName = "Textarea";
 
-const Select = React.forwardRef<
-  HTMLSelectElement,
-  React.SelectHTMLAttributes<HTMLSelectElement>
->(({ className, children, ...props }, ref) => {
-  return (
+// ✅ FIXED: Proper forwardRef with props typed for Select
+const Select = React.forwardRef<HTMLSelectElement, React.SelectHTMLAttributes<HTMLSelectElement>>(
+  ({ className, children, ...props }, ref) => (
     <select
-      className={`flex h-10 w-full rounded-md border border-input bg-black/20 backdrop-blur-sm px-3 py-2 text-sm text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
       ref={ref}
+      className={`flex h-10 w-full rounded-md border border-input bg-black/20 backdrop-blur-sm px-3 py-2 text-sm text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
       {...props}
     >
       {children}
     </select>
-  );
-});
+  )
+);
 Select.displayName = "Select";
 
 export const InterviewSetup: React.FC = () => {
@@ -54,7 +50,6 @@ export const InterviewSetup: React.FC = () => {
 
     setIsLoading(true);
     try {
-      // Save the setup and proceed to interview
       setScreenState({ currentScreen: "instructions" });
     } catch (error) {
       console.error("Error starting interview:", error);

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useAtom } from "jotai";
 import { screenAtom } from "@/store/screens";
-import { interviewSetupAtom, InterviewSetup } from "@/store/interview";
+import { interviewSetupAtom, IInterviewSetup } from "@/store/interview";
 import { DialogWrapper, AnimatedTextBlockWrapper } from "@/components/DialogWrapper";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -64,7 +64,7 @@ export const InterviewSetup: React.FC = () => {
     }
   };
 
-  const updateSetup = (field: keyof InterviewSetup, value: string | number) => {
+  const updateSetup = (field: keyof IInterviewSetup, value: string | number) => {
     setInterviewSetup(prev => ({
       ...prev,
       [field]: value

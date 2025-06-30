@@ -1,6 +1,6 @@
 import { atom } from "jotai";
 
-export interface InterviewSetup {
+export interface IInterviewSetup {
   jobTitle: string;
   company: string;
   description: string;
@@ -12,7 +12,7 @@ export interface InterviewSetup {
 
 export interface InterviewSession {
   id: string;
-  setup: InterviewSetup;
+  setup: IInterviewSetup;
   startTime: Date;
   endTime?: Date;
   score?: number;
@@ -25,7 +25,7 @@ export interface InterviewSession {
   }>;
 }
 
-const initialInterviewSetup: InterviewSetup = {
+const initialInterviewSetup: IInterviewSetup = {
   jobTitle: '',
   company: '',
   description: '',
@@ -35,6 +35,6 @@ const initialInterviewSetup: InterviewSetup = {
   duration: 30
 };
 
-export const interviewSetupAtom = atom<InterviewSetup>(initialInterviewSetup);
+export const interviewSetupAtom = atom<IInterviewSetup>(initialInterviewSetup);
 export const currentInterviewAtom = atom<InterviewSession | null>(null);
 export const interviewHistoryAtom = atom<InterviewSession[]>([]);

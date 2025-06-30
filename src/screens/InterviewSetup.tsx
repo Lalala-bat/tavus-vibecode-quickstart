@@ -33,7 +33,7 @@ const Select = React.forwardRef<HTMLSelectElement, React.SelectHTMLAttributes<HT
 );
 Select.displayName = "Select";
 
-export const InterviewSetup: React.FC = () => {
+export const InterviewSetupYay: React.FC = () => {
   const [, setScreenState] = useAtom(screenAtom);
   const [interviewSetup, setInterviewSetup] = useAtom(interviewSetupAtom);
   const [isLoading, setIsLoading] = useState(false);
